@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anagrafica - Centro Studi Petrarca</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+        }
+        
+        .nav-item {
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 12px 15px;
+            display: block;
+            border-radius: 5px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        .student-row {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .student-row:hover {
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+        
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .badge-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .firebase-alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-250px);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block !important;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 5px;
+            }
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .search-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-group .form-check {
+            min-width: 80px;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-graduation-cap"></i> Centro Studi Petrarca</h3>
+        <nav>
+            <div class="nav-item">
+                <a class="nav-link active" onclick="showPage('dashboard', this)">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPage('schools', this)">
+                    <i class="fas fa-school"></i> Scuole Paritarie
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPage('students', this)">
+                    <i class="fas fa-users"></i> Anagrafica
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPage('export', this)">
+                    <i class="fas fa-file-excel"></i> Esportazione
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Firebase Alert -->
+        <div class="firebase-alert" id="firebase-alert">
+            <strong>⚠️ Modalità Demo</strong> - Il sistema sta funzionando in modalità locale. 
+            Per abilitare la sincronizzazione in tempo reale tra più utenti, configura Firebase seguendo le istruzioni fornite.
+        </div>
+        
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page">
+            <h2 class="mb-4"><i class="fas fa-chart-line"></i> Dashboard</h2>
+            
+            <div class="row">
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-students">0</div>
+                        <div class="stat-label">Studenti Totali</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="active-students">0</div>
+                        <div class="stat-label">Studenti Attivi</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-schools">0</div>
+                        <div class="stat-label">Scuole Paritarie</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-courses">0</div>
+                        <div class="stat-label">Indirizzi di Studio</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics by Path -->
+            <div class="form-section mt-4">
+                <h4 class="section-title">Percorsi Scelti</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="path-idoneita">0</div>
+                            <div class="stat-label">Idoneità</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="path-maturita">0</div>
+                            <div class="stat-label">Maturità</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="path-both">0</div>
+                            <div class="stat-label">Idoneità + Maturità</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics by Course -->
+            <div class="form-section">
+                <h4 class="section-title">Studenti per Indirizzo di Studi</h4>
+                <div id="course-stats" class="row"></div>
+            </div>
+            
+            <!-- Statistics by School -->
+            <div class="form-section">
+                <h4 class="section-title">Studenti per Scuola Paritaria</h4>
+                <div id="school-stats" class="row"></div>
+            </div>
+        </div>
+        
+        <!-- Schools Page -->
+        <div id="schools-page" class="page" style="display: none;">
+            <h2 class="mb-4"><i class="fas fa-school"></i> Gestione Scuole Paritarie</h2>
+            
+            <div class="form-section">
+                <h4 class="section-title">Aggiungi Nuova Scuola</h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="new-school-name" placeholder="Nome della scuola">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success w-100" onclick="addSchool()">
+                            <i class="fas fa-plus"></i> Aggiungi Scuola
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h4 class="section-title">Elenco Scuole Paritarie</h4>
+                <div id="schools-list"></div>
+            </div>
+        </div>
+        
+        <!-- Students Page -->
+        <div id="students-page" class="page" style="display: none;">
+            <h2 class="mb-4"><i class="fas fa-users"></i> Anagrafica Studenti</h2>
+            
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="search-input" 
+                               placeholder="Cerca per nome, cognome, email o cellulare..."
+                               onkeyup="searchStudents()">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100" onclick="searchStudents()">
+                            <i class="fas fa-search"></i> Cerca
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-success mb-3" onclick="showAddStudentForm()">
+                <i class="fas fa-user-plus"></i> Nuova Anagrafica
+            </button>
+            
+            <!-- Add/Edit Student Form -->
+            <div id="student-form" class="form-section" style="display: none;">
+                <h4 class="section-title" id="form-title">Aggiungi Nuovo Studente</h4>
+                <form id="add-student-form">
+                    <input type="hidden" id="student-id">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome *</label>
+                            <input type="text" class="form-control" id="student-name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Cognome *</label>
+                            <input type="text" class="form-control" id="student-surname" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Indirizzo di Studi *</label>
+                            <select class="form-select" id="student-course" required>
+                                <option value="">Seleziona...</option>
+                                <option value="AFM">AFM</option>
+                                <option value="AFM inglese e Francese">AFM inglese e Francese</option>
+                                <option value="AFM inglese e spagnolo">AFM inglese e spagnolo</option>
+                                <option value="AFM RIM">AFM RIM</option>
+                                <option value="AFM SIA">AFM SIA</option>
+                                <option value="CAT">CAT</option>
+                                <option value="LSU">LSU</option>
+                                <option value="LES Inglese e Francese">LES Inglese e Francese</option>
+                                <option value="LES Inglese e Spagnolo">LES Inglese e Spagnolo</option>
+                                <option value="Liceo Linguistico">Liceo Linguistico</option>
+                                <option value="Liceo Classico">Liceo Classico</option>
+                                <option value="IPSSS">IPSSS</option>
+                                <option value="Informatico">Informatico (Informatica e Telecomunicazioni)</option>
+                                <option value="Elettronico ed Elettrotecnico">Elettronico ed Elettrotecnico</option>
+                                <option value="Meccanico">Meccanico</option>
+                                <option value="Alberghiero Eno">Alberghiero Eno</option>
+                                <option value="Alberghiero Accoglienza">Alberghiero Accoglienza</option>
+                                <option value="Alberghiero Sala">Alberghiero Sala</option>
+                                <option value="Liceo Scientifico">Liceo Scientifico</option>
+                                <option value="Liceo Scienze Applicate">Liceo Scienze Applicate</option>
+                                <option value="Sistema Moda">Sistema Moda</option>
+                                <option value="Odontotecnico">Odontotecnico</option>
+                                <option value="Ottico">Ottico</option>
+                                <option value="Nautico Capitani">Nautico Capitani</option>
+                                <option value="Nautico Macchinista">Nautico Macchinista</option>
+                                <option value="Chimico">Chimico</option>
+                                <option value="Agrario">Agrario</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Scuola Paritaria</label>
+                            <select class="form-select" id="student-school">
+                                <option value="">Seleziona...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Anni da Recuperare</label>
+                        <div class="checkbox-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="I" id="year-1">
+                                <label class="form-check-label" for="year-1">I</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="II" id="year-2">
+                                <label class="form-check-label" for="year-2">II</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="III" id="year-3">
+                                <label class="form-check-label" for="year-3">III</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="IV" id="year-4">
+                                <label class="form-check-label" for="year-4">IV</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="V" id="year-5">
+                                <label class="form-check-label" for="year-5">V</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Percorso Scolastico (Note)</label>
+                        <textarea class="form-control" id="student-notes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="student-email">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cellulare 1</label>
+                            <input type="tel" class="form-control" id="student-phone1">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cellulare 2</label>
+                            <input type="tel" class="form-control" id="student-phone2">
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-3 mb-3">Dati Genitori</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Nome Genitore</label>
+                            <input type="text" class="form-control" id="parent-name">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cognome Genitore</label>
+                            <input type="text" class="form-control" id="parent-surname">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Email Genitore</label>
+                            <input type="email" class="form-control" id="parent-email">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cellulare Genitore</label>
+                            <input type="tel" class="form-control" id="parent-phone">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Percorso Scelto</label>
+                            <select class="form-select" id="student-path">
+                                <option value="">Seleziona...</option>
+                                <option value="Idoneità">Idoneità</option>
+                                <option value="Maturità">Maturità</option>
+                                <option value="Idoneità + Maturità">Idoneità + Maturità</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Stato</label>
+                            <select class="form-select" id="student-status">
+                                <option value="Attivo">Attivo</option>
+                                <option value="Non Attivo">Non Attivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Salva
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddStudentForm()">
+                            <i class="fas fa-times"></i> Annulla
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Students List -->
+            <div class="form-section">
+                <h4 class="section-title">Elenco Studenti</h4>
+                <div id="students-list"></div>
+            </div>
+        </div>
+        
+        <!-- Export Page -->
+        <div id="export-page" class="page" style="display: none;">
+            <h2 class="mb-4"><i class="fas fa-file-excel"></i> Esportazione Dati</h2>
+            
+            <div class="form-section">
+                <h4 class="section-title">Esportazione con Filtri</h4>
+                
+                <!-- Export by Course -->
+                <div class="mb-4 p-3 border rounded">
+                    <h5 class="mb-3">Esporta per Indirizzo di Studi</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <select class="form-select" id="export-course-select">
+                                <option value="">Seleziona un indirizzo di studi...</option>
+                                <option value="AFM">AFM</option>
+                                <option value="AFM inglese e Francese">AFM inglese e Francese</option>
+                                <option value="AFM inglese e spagnolo">AFM inglese e spagnolo</option>
+                                <option value="AFM RIM">AFM RIM</option>
+                                <option value="AFM SIA">AFM SIA</option>
+                                <option value="CAT">CAT</option>
+                                <option value="LSU">LSU</option>
+                                <option value="LES Inglese e Francese">LES Inglese e Francese</option>
+                                <option value="LES Inglese e Spagnolo">LES Inglese e Spagnolo</option>
+                                <option value="Liceo Linguistico">Liceo Linguistico</option>
+                                <option value="Liceo Classico">Liceo Classico</option>
+                                <option value="IPSSS">IPSSS</option>
+                                <option value="Informatico">Informatico (Informatica e Telecomunicazioni)</option>
+                                <option value="Elettronico ed Elettrotecnico">Elettronico ed Elettrotecnico</option>
+                                <option value="Meccanico">Meccanico</option>
+                                <option value="Alberghiero Eno">Alberghiero Eno</option>
+                                <option value="Alberghiero Accoglienza">Alberghiero Accoglienza</option>
+                                <option value="Alberghiero Sala">Alberghiero Sala</option>
+                                <option value="Liceo Scientifico">Liceo Scientifico</option>
+                                <option value="Liceo Scienze Applicate">Liceo Scienze Applicate</option>
+                                <option value="Sistema Moda">Sistema Moda</option>
+                                <option value="Odontotecnico">Odontotecnico</option>
+                                <option value="Ottico">Ottico</option>
+                                <option value="Nautico Capitani">Nautico Capitani</option>
+                                <option value="Nautico Macchinista">Nautico Macchinista</option>
+                                <option value="Chimico">Chimico</option>
+                                <option value="Agrario">Agrario</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="exportByCourse()">
+                                <i class="fas fa-download"></i> Esporta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export by School -->
+                <div class="mb-4 p-3 border rounded">
+                    <h5 class="mb-3">Esporta per Scuola Paritaria</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <select class="form-select" id="export-school-select">
+                                <option value="">Seleziona una scuola paritaria...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="exportBySchool()">
+                                <i class="fas fa-download"></i> Esporta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export by Path -->
+                <div class="mb-4 p-3 border rounded">
+                    <h5 class="mb-3">Esporta per Percorso</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <select class="form-select" id="export-path-select">
+                                <option value="">Seleziona un percorso...</option>
+                                <option value="Idoneità">Idoneità</option>
+                                <option value="Maturità">Maturità</option>
+                                <option value="Idoneità + Maturità">Idoneità + Maturità</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="exportByPath()">
+                                <i class="fas fa-download"></i> Esporta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h4 class="section-title">Esportazioni Generali</h4>
+                
+                <div class="export-buttons">
+                    <button class="btn btn-info" onclick="exportData('name')">
+                        <i class="fas fa-download"></i> Tutti gli Studenti (Ordinati per Cognome)
+                    </button>
+                    <button class="btn btn-success" onclick="exportData('complete')">
+                        <i class="fas fa-download"></i> Esportazione Completa (Tutti i Dati)
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Database Manager - Uses localStorage as fallback
+        class DatabaseManager {
+            constructor() {
+                this.useLocalStorage = true;
+                this.initializeData();
+            }
+            
+            initializeData() {
+                // Initialize schools if not present
+                if (!localStorage.getItem('schools')) {
+                    const initialSchools = [
+                        "Verga-Acerra",
+                        "Verga-Frattaminore",
+                        "G.Paolo II-Frattamaggiore",
+                        "Vespucci",
+                        "A.Moro-Nola",
+                        "A.Moro-Baiano",
+                        "Tito Livio",
+                        "Kolbe",
+                        "Santa Rita",
+                        "Romano",
+                        "Future",
+                        "Intellighenzia",
+                        "Montale",
+                        "Carlo di Borbone",
+                        "G.Paolo II-Ostia",
+                        "Pascoli",
+                        "Padre Lanzano",
+                        "San Giuliana",
+                        "Padre Rocco"
+                    ];
+                    
+                    const schools = initialSchools.map((name, index) => ({
+                        id: 'school_' + Date.now() + '_' + index,
+                        name: name,
+                        createdAt: new Date().toISOString()
+                    }));
+                    
+                    localStorage.setItem('schools', JSON.stringify(schools));
+                }
+                
+                // Initialize students if not present
+                if (!localStorage.getItem('students')) {
+                    localStorage.setItem('students', JSON.stringify([]));
+                }
+            }
+            
+            // Schools methods
+            async getSchools() {
+                const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+                return schools.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            
+            async addSchool(school) {
+                const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+                const newSchool = {
+                    id: 'school_' + Date.now(),
+                    ...school,
+                    createdAt: new Date().toISOString()
+                };
+                schools.push(newSchool);
+                localStorage.setItem('schools', JSON.stringify(schools));
+                return newSchool;
+            }
+            
+            async deleteSchool(id) {
+                const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+                const filtered = schools.filter(s => s.id !== id);
+                localStorage.setItem('schools', JSON.stringify(filtered));
+            }
+            
+            // Students methods
+            async getStudents() {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                return students.sort((a, b) => (a.surname || '').localeCompare(b.surname || ''));
+            }
+            
+            async addStudent(student) {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const newStudent = {
+                    id: 'student_' + Date.now(),
+                    ...student,
+                    createdAt: new Date().toISOString()
+                };
+                students.push(newStudent);
+                localStorage.setItem('students', JSON.stringify(students));
+                return newStudent;
+            }
+            
+            async updateStudent(id, data) {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const index = students.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    students[index] = { ...students[index], ...data };
+                    localStorage.setItem('students', JSON.stringify(students));
+                }
+            }
+            
+            async deleteStudent(id) {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const filtered = students.filter(s => s.id !== id);
+                localStorage.setItem('students', JSON.stringify(filtered));
+            }
+        }
+        
+        // Initialize database
+        const db = new DatabaseManager();
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            loadSchools();
+            loadStudents();
+        });
+        
+        // Page navigation
+        function showPage(page, element) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(page + '-page').style.display = 'block';
+            
+            // Add active class to clicked nav link
+            if (element) element.classList.add('active');
+            
+            // Refresh data
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'schools') loadSchools();
+            if (page === 'students') loadStudents();
+            if (page === 'export') loadExportOptions();
+        }
+        
+        // Load export options
+        async function loadExportOptions() {
+            const schools = await db.getSchools();
+            const schoolSelect = document.getElementById('export-school-select');
+            
+            let selectOptions = '<option value="">Seleziona una scuola paritaria...</option>';
+            schools.forEach(school => {
+                selectOptions += `<option value="${school.name}">${school.name}</option>`;
+            });
+            
+            schoolSelect.innerHTML = selectOptions;
+        }
+        
+        // Toggle sidebar for mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+        
+        // Load dashboard statistics
+        async function loadDashboard() {
+            try {
+                const students = await db.getStudents();
+                const schools = await db.getSchools();
+                
+                // Total students
+                document.getElementById('total-students').textContent = students.length;
+                
+                // Active students
+                const activeStudents = students.filter(s => s.status === 'Attivo').length;
+                document.getElementById('active-students').textContent = activeStudents;
+                
+                // Total schools
+                document.getElementById('total-schools').textContent = schools.length;
+                
+                // Count unique courses
+                const courses = [...new Set(students.map(s => s.course).filter(c => c))];
+                document.getElementById('total-courses').textContent = courses.length;
+                
+                // Statistics by course
+                const courseStats = {};
+                students.forEach(s => {
+                    if (s.course) {
+                        courseStats[s.course] = (courseStats[s.course] || 0) + 1;
+                    }
+                });
+                
+                const courseStatsHtml = Object.entries(courseStats).map(([course, count]) => `
+                    <div class="col-md-4 mb-2">
+                        <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                            <span>${course}</span>
+                            <span class="badge bg-primary">${count}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('course-stats').innerHTML = courseStatsHtml || '<p class="text-muted">Nessun dato disponibile</p>';
+                
+                // Statistics by school
+                const schoolStats = {};
+                students.forEach(s => {
+                    if (s.school) {
+                        schoolStats[s.school] = (schoolStats[s.school] || 0) + 1;
+                    }
+                });
+                
+                const schoolStatsHtml = Object.entries(schoolStats).map(([school, count]) => `
+                    <div class="col-md-4 mb-2">
+                        <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                            <span>${school}</span>
+                            <span class="badge bg-info">${count}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('school-stats').innerHTML = schoolStatsHtml || '<p class="text-muted">Nessun dato disponibile</p>';
+                
+                // Path statistics
+                const pathStats = { 'Idoneità': 0, 'Maturità': 0, 'Idoneità + Maturità': 0 };
+                students.forEach(s => {
+                    if (s.path && pathStats.hasOwnProperty(s.path)) {
+                        pathStats[s.path]++;
+                    }
+                });
+                
+                document.getElementById('path-idoneita').textContent = pathStats['Idoneità'];
+                document.getElementById('path-maturita').textContent = pathStats['Maturità'];
+                document.getElementById('path-both').textContent = pathStats['Idoneità + Maturità'];
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        // Load schools
+        async function loadSchools() {
+            try {
+                const schools = await db.getSchools();
+                const schoolsList = document.getElementById('schools-list');
+                const schoolSelect = document.getElementById('student-school');
+                
+                let html = '';
+                let selectOptions = '<option value="">Seleziona...</option>';
+                
+                schools.forEach(school => {
+                    html += `
+                        <div class="student-row d-flex justify-content-between align-items-center">
+                            <span>${school.name}</span>
+                            <button class="btn btn-sm btn-danger" onclick="deleteSchool('${school.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    selectOptions += `<option value="${school.name}">${school.name}</option>`;
+                });
+                
+                schoolsList.innerHTML = html || '<p class="text-muted">Nessuna scuola presente</p>';
+                schoolSelect.innerHTML = selectOptions;
+                
+            } catch (error) {
+                console.error('Error loading schools:', error);
+            }
+        }
+        
+        // Add new school
+        async function addSchool() {
+            const schoolName = document.getElementById('new-school-name').value.trim();
+            
+            if (!schoolName) {
+                alert('Inserisci il nome della scuola');
+                return;
+            }
+            
+            try {
+                await db.addSchool({ name: schoolName });
+                document.getElementById('new-school-name').value = '';
+                loadSchools();
+                alert('Scuola aggiunta con successo!');
+            } catch (error) {
+                console.error('Error adding school:', error);
+                alert('Errore nell\'aggiunta della scuola');
+            }
+        }
+        
+        // Delete school
+        async function deleteSchool(id) {
+            if (confirm('Sei sicuro di voler eliminare questa scuola?')) {
+                try {
+                    await db.deleteSchool(id);
+                    loadSchools();
+                } catch (error) {
+                    console.error('Error deleting school:', error);
+                    alert('Errore nell\'eliminazione della scuola');
+                }
+            }
+        }
+        
+        // Show add student form
+        function showAddStudentForm() {
+            document.getElementById('student-form').style.display = 'block';
+            document.getElementById('add-student-form').reset();
+            document.getElementById('student-id').value = '';
+            document.getElementById('form-title').textContent = 'Aggiungi Nuovo Studente';
+        }
+        
+        // Hide add student form
+        function hideAddStudentForm() {
+            document.getElementById('student-form').style.display = 'none';
+        }
+        
+        // Add/Edit student form submission
+        document.getElementById('add-student-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get years to recover
+            const years = [];
+            for (let i = 1; i <= 5; i++) {
+                if (document.getElementById('year-' + i).checked) {
+                    years.push(document.getElementById('year-' + i).value);
+                }
+            }
+            
+            const studentData = {
+                name: document.getElementById('student-name').value,
+                surname: document.getElementById('student-surname').value,
+                course: document.getElementById('student-course').value,
+                school: document.getElementById('student-school').value,
+                yearsToRecover: years,
+                notes: document.getElementById('student-notes').value,
+                email: document.getElementById('student-email').value,
+                phone1: document.getElementById('student-phone1').value,
+                phone2: document.getElementById('student-phone2').value,
+                parentName: document.getElementById('parent-name').value,
+                parentSurname: document.getElementById('parent-surname').value,
+                parentEmail: document.getElementById('parent-email').value,
+                parentPhone: document.getElementById('parent-phone').value,
+                path: document.getElementById('student-path').value,
+                status: document.getElementById('student-status').value
+            };
+            
+            try {
+                const studentId = document.getElementById('student-id').value;
+                
+                if (studentId) {
+                    await db.updateStudent(studentId, studentData);
+                    alert('Studente aggiornato con successo!');
+                } else {
+                    await db.addStudent(studentData);
+                    alert('Studente aggiunto con successo!');
+                }
+                
+                hideAddStudentForm();
+                loadStudents();
+                loadDashboard();
+            } catch (error) {
+                console.error('Error saving student:', error);
+                alert('Errore nel salvataggio dello studente');
+            }
+        });
+        
+        // Load students
+        async function loadStudents() {
+            try {
+                const students = await db.getStudents();
+                displayStudents(students);
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+        
+        // Display students
+        function displayStudents(students) {
+            const studentsList = document.getElementById('students-list');
+            
+            let html = '';
+            students.forEach(student => {
+                const statusClass = student.status === 'Attivo' ? 'badge-active' : 'badge-inactive';
+                
+                html += `
+                    <div class="student-row">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <strong>${student.surname} ${student.name}</strong>
+                                <br><small class="text-muted">${student.course || 'N/A'}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <small>${student.email || 'N/A'}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <small>${student.phone1 || 'N/A'}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <small>${student.path || 'N/A'}</small>
+                            </div>
+                            <div class="col-md-1">
+                                <span class="badge-status ${statusClass}">${student.status}</span>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-primary me-1" onclick="editStudent('${student.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStudent('${student.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            studentsList.innerHTML = html || '<p class="text-muted">Nessuno studente presente</p>';
+        }
+        
+        // Search students
+        async function searchStudents() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            const students = await db.getStudents();
+            
+            if (!searchTerm) {
+                displayStudents(students);
+                return;
+            }
+            
+            const filtered = students.filter(student => {
+                const searchFields = [
+                    student.name,
+                    student.surname,
+                    student.email,
+                    student.phone1,
+                    student.phone2
+                ].filter(f => f).map(f => f.toLowerCase());
+                
+                return searchFields.some(field => field.includes(searchTerm));
+            });
+            
+            displayStudents(filtered);
+        }
+        
+        // Edit student
+        async function editStudent(id) {
+            const students = await db.getStudents();
+            const student = students.find(s => s.id === id);
+            
+            if (!student) return;
+            
+            // Show form
+            document.getElementById('student-form').style.display = 'block';
+            document.getElementById('form-title').textContent = 'Modifica Studente';
+            
+            // Populate form
+            document.getElementById('student-id').value = id;
+            document.getElementById('student-name').value = student.name || '';
+            document.getElementById('student-surname').value = student.surname || '';
+            document.getElementById('student-course').value = student.course || '';
+            document.getElementById('student-school').value = student.school || '';
+            document.getElementById('student-notes').value = student.notes || '';
+            document.getElementById('student-email').value = student.email || '';
+            document.getElementById('student-phone1').value = student.phone1 || '';
+            document.getElementById('student-phone2').value = student.phone2 || '';
+            document.getElementById('parent-name').value = student.parentName || '';
+            document.getElementById('parent-surname').value = student.parentSurname || '';
+            document.getElementById('parent-email').value = student.parentEmail || '';
+            document.getElementById('parent-phone').value = student.parentPhone || '';
+            document.getElementById('student-path').value = student.path || '';
+            document.getElementById('student-status').value = student.status || 'Attivo';
+            
+            // Set years checkboxes
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('year-' + i).checked = false;
+            }
+            if (student.yearsToRecover) {
+                student.yearsToRecover.forEach(year => {
+                    const checkbox = document.querySelector(`#year-${['I','II','III','IV','V'].indexOf(year) + 1}`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+            
+            // Scroll to form
+            document.getElementById('student-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete student
+        async function deleteStudent(id) {
+            if (confirm('Sei sicuro di voler eliminare questo studente?')) {
+                try {
+                    await db.deleteStudent(id);
+                    loadStudents();
+                    loadDashboard();
+                } catch (error) {
+                    console.error('Error deleting student:', error);
+                    alert('Errore nell\'eliminazione dello studente');
+                }
+            }
+        }
+        
+        // Export by course with filter
+        async function exportByCourse() {
+            const selectedCourse = document.getElementById('export-course-select').value;
+            
+            if (!selectedCourse) {
+                alert('Seleziona un indirizzo di studi');
+                return;
+            }
+            
+            try {
+                const students = await db.getStudents();
+                const filtered = students.filter(s => s.course === selectedCourse);
+                
+                if (filtered.length === 0) {
+                    alert('Nessuno studente trovato per questo indirizzo');
+                    return;
+                }
+                
+                const dataToExport = filtered.map(s => ({
+                    'Cognome': s.surname,
+                    'Nome': s.name,
+                    'Indirizzo di Studi': s.course || 'N/A',
+                    'Scuola Paritaria': s.school || 'N/A',
+                    'Anni da Recuperare': s.yearsToRecover ? s.yearsToRecover.join(', ') : 'N/A',
+                    'Note': s.notes || '',
+                    'Email': s.email || '',
+                    'Cellulare 1': s.phone1 || '',
+                    'Cellulare 2': s.phone2 || '',
+                    'Nome Genitore': s.parentName || '',
+                    'Cognome Genitore': s.parentSurname || '',
+                    'Email Genitore': s.parentEmail || '',
+                    'Cellulare Genitore': s.parentPhone || '',
+                    'Percorso': s.path || 'N/A',
+                    'Stato': s.status || 'N/A'
+                }));
+                
+                const ws = XLSX.utils.json_to_sheet(dataToExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Studenti');
+                
+                const filename = `studenti_${selectedCourse.replace(/\s+/g, '_').toLowerCase()}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Errore nell\'esportazione dei dati');
+            }
+        }
+        
+        // Export by school with filter
+        async function exportBySchool() {
+            const selectedSchool = document.getElementById('export-school-select').value;
+            
+            if (!selectedSchool) {
+                alert('Seleziona una scuola paritaria');
+                return;
+            }
+            
+            try {
+                const students = await db.getStudents();
+                const filtered = students.filter(s => s.school === selectedSchool);
+                
+                if (filtered.length === 0) {
+                    alert('Nessuno studente trovato per questa scuola');
+                    return;
+                }
+                
+                const dataToExport = filtered.map(s => ({
+                    'Cognome': s.surname,
+                    'Nome': s.name,
+                    'Indirizzo di Studi': s.course || 'N/A',
+                    'Scuola Paritaria': s.school || 'N/A',
+                    'Anni da Recuperare': s.yearsToRecover ? s.yearsToRecover.join(', ') : 'N/A',
+                    'Note': s.notes || '',
+                    'Email': s.email || '',
+                    'Cellulare 1': s.phone1 || '',
+                    'Cellulare 2': s.phone2 || '',
+                    'Nome Genitore': s.parentName || '',
+                    'Cognome Genitore': s.parentSurname || '',
+                    'Email Genitore': s.parentEmail || '',
+                    'Cellulare Genitore': s.parentPhone || '',
+                    'Percorso': s.path || 'N/A',
+                    'Stato': s.status || 'N/A'
+                }));
+                
+                const ws = XLSX.utils.json_to_sheet(dataToExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Studenti');
+                
+                const filename = `studenti_${selectedSchool.replace(/\s+/g, '_').toLowerCase()}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Errore nell\'esportazione dei dati');
+            }
+        }
+        
+        // Export by path with filter
+        async function exportByPath() {
+            const selectedPath = document.getElementById('export-path-select').value;
+            
+            if (!selectedPath) {
+                alert('Seleziona un percorso');
+                return;
+            }
+            
+            try {
+                const students = await db.getStudents();
+                const filtered = students.filter(s => s.path === selectedPath);
+                
+                if (filtered.length === 0) {
+                    alert('Nessuno studente trovato per questo percorso');
+                    return;
+                }
+                
+                const dataToExport = filtered.map(s => ({
+                    'Cognome': s.surname,
+                    'Nome': s.name,
+                    'Indirizzo di Studi': s.course || 'N/A',
+                    'Scuola Paritaria': s.school || 'N/A',
+                    'Anni da Recuperare': s.yearsToRecover ? s.yearsToRecover.join(', ') : 'N/A',
+                    'Note': s.notes || '',
+                    'Email': s.email || '',
+                    'Cellulare 1': s.phone1 || '',
+                    'Cellulare 2': s.phone2 || '',
+                    'Nome Genitore': s.parentName || '',
+                    'Cognome Genitore': s.parentSurname || '',
+                    'Email Genitore': s.parentEmail || '',
+                    'Cellulare Genitore': s.parentPhone || '',
+                    'Percorso': s.path || 'N/A',
+                    'Stato': s.status || 'N/A'
+                }));
+                
+                const ws = XLSX.utils.json_to_sheet(dataToExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Studenti');
+                
+                const filename = `studenti_${selectedPath.replace(/\s+/g, '_').toLowerCase()}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Errore nell\'esportazione dei dati');
+            }
+        }
+        
+        // Export data to Excel
+        async function exportData(type) {
+            try {
+                const students = await db.getStudents();
+                
+                let dataToExport = [];
+                let filename = 'export.xlsx';
+                
+                switch(type) {
+                    case 'name':
+                        dataToExport = students.map(s => ({
+                            'Cognome': s.surname,
+                            'Nome': s.name,
+                            'Indirizzo di Studi': s.course || 'N/A',
+                            'Scuola Paritaria': s.school || 'N/A',
+                            'Anni da Recuperare': s.yearsToRecover ? s.yearsToRecover.join(', ') : 'N/A',
+                            'Note': s.notes || '',
+                            'Email': s.email || '',
+                            'Cellulare 1': s.phone1 || '',
+                            'Cellulare 2': s.phone2 || '',
+                            'Nome Genitore': s.parentName || '',
+                            'Cognome Genitore': s.parentSurname || '',
+                            'Email Genitore': s.parentEmail || '',
+                            'Cellulare Genitore': s.parentPhone || '',
+                            'Percorso': s.path || 'N/A',
+                            'Stato': s.status || 'N/A'
+                        }));
+                        filename = 'studenti_tutti.xlsx';
+                        break;
+                        
+                    case 'complete':
+                        dataToExport = students.map(s => ({
+                            'Cognome': s.surname,
+                            'Nome': s.name,
+                            'Indirizzo di Studi': s.course || 'N/A',
+                            'Scuola Paritaria': s.school || 'N/A',
+                            'Anni da Recuperare': s.yearsToRecover ? s.yearsToRecover.join(', ') : 'N/A',
+                            'Note': s.notes || '',
+                            'Email': s.email || '',
+                            'Cellulare 1': s.phone1 || '',
+                            'Cellulare 2': s.phone2 || '',
+                            'Nome Genitore': s.parentName || '',
+                            'Cognome Genitore': s.parentSurname || '',
+                            'Email Genitore': s.parentEmail || '',
+                            'Cellulare Genitore': s.parentPhone || '',
+                            'Percorso': s.path || 'N/A',
+                            'Stato': s.status || 'N/A',
+                            'Data Inserimento': s.createdAt || 'N/A'
+                        }));
+                        filename = 'anagrafica_completa.xlsx';
+                        break;
+                }
+                
+                if (dataToExport.length === 0) {
+                    alert('Nessun dato da esportare');
+                    return;
+                }
+                
+                // Create workbook and worksheet
+                const ws = XLSX.utils.json_to_sheet(dataToExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Studenti');
+                
+                // Save file
+                XLSX.writeFile(wb, filename);
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Errore nell\'esportazione dei dati');
+            }
+        }
+    </script>
+</body>
+</html>
