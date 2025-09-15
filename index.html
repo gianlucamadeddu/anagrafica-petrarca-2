@@ -672,7 +672,7 @@
                 try {
                     const schoolsSnapshot = await this.db.collection('schools').get();
                     
-                    if (schoolsSnapshot.empty) {
+                    if (schoolsSnapshot.size < 5) {
                         const initialSchools = [
                             "Verga-Acerra",
                             "Verga-Frattaminore",
